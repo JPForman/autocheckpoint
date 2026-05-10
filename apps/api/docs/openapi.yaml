@@ -1,0 +1,360 @@
+openapi: 3.0.3
+info:
+  title: AutoCheckpoint API
+  version: 1.0.0
+  description: REST API for the AutoCheckpoint auto care service (JWT cookies, PostgreSQL).
+servers:
+  - url: http://localhost:4000/api/v1
+    description: Local API
+tags:
+  - name: Auth
+  - name: Users
+  - name: Vehicles
+  - name: Appointments
+  - name: Availability
+  - name: Admin
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, firstName, lastName]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+                firstName: { type: string }
+                lastName: { type: string }
+                phone: { type: string }
+      responses:
+        '201':
+          description: Created
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login (sets httpOnly cookies)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        '200':
+          description: OK
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Rotate refresh token
+      responses:
+        '200':
+          description: OK
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Logout current session
+      security: [{ cookieAuth: [] }]
+      responses:
+        '204':
+          description: No content
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Current user
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: OK
+  /auth/forgot-password:
+    post:
+      tags: [Auth]
+      summary: Request password reset email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string }
+      responses:
+        '200':
+          description: Always OK (no enumeration)
+  /auth/reset-password:
+    post:
+      tags: [Auth]
+      summary: Reset password with token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, password]
+              properties:
+                token: { type: string }
+                password: { type: string, minLength: 8 }
+      responses:
+        '200':
+          description: OK
+  /users/me:
+    get:
+      tags: [Users]
+      security: [{ cookieAuth: [] }]
+      summary: Profile
+      responses:
+        '200':
+          description: OK
+    patch:
+      tags: [Users]
+      security: [{ cookieAuth: [] }]
+      summary: Update profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName: { type: string }
+                lastName: { type: string }
+                phone: { type: string, nullable: true }
+      responses:
+        '200':
+          description: OK
+  /vehicles:
+    get:
+      tags: [Vehicles]
+      security: [{ cookieAuth: [] }]
+      summary: List my vehicles (customer)
+      responses:
+        '200':
+          description: OK
+    post:
+      tags: [Vehicles]
+      security: [{ cookieAuth: [] }]
+      summary: Add vehicle
+      responses:
+        '201':
+          description: Created
+  /vehicles/{id}:
+    patch:
+      tags: [Vehicles]
+      security: [{ cookieAuth: [] }]
+      summary: Update vehicle
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags: [Vehicles]
+      security: [{ cookieAuth: [] }]
+      summary: Delete vehicle
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '204':
+          description: No content
+  /appointments:
+    get:
+      tags: [Appointments]
+      security: [{ cookieAuth: [] }]
+      summary: List appointments (scoped by role)
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [SCHEDULED, IN_PROGRESS, COMPLETED, CANCELED, NO_SHOW]
+      responses:
+        '200':
+          description: OK
+    post:
+      tags: [Appointments]
+      security: [{ cookieAuth: [] }]
+      summary: Book appointment (customer)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [vehicleId, startsAt, serviceType]
+              properties:
+                vehicleId: { type: string }
+                startsAt: { type: string, format: date-time }
+                serviceType: { type: string }
+                customerNotes: { type: string }
+                assignedEmployeeId: { type: string }
+      responses:
+        '201':
+          description: Created
+  /appointments/{id}:
+    get:
+      tags: [Appointments]
+      security: [{ cookieAuth: [] }]
+      summary: Get appointment
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+    patch:
+      tags: [Appointments]
+      security: [{ cookieAuth: [] }]
+      summary: Update appointment (customer cancel/reschedule or staff)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+  /availability:
+    get:
+      tags: [Availability]
+      security: [{ cookieAuth: [] }]
+      summary: Get employee availability
+      parameters:
+        - in: query
+          name: employeeId
+          schema: { type: string }
+          description: Required for admins
+      responses:
+        '200':
+          description: OK
+    put:
+      tags: [Availability]
+      security: [{ cookieAuth: [] }]
+      summary: Replace availability windows
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [slots]
+              properties:
+                employeeId:
+                  type: string
+                  description: Required when caller is admin
+                slots:
+                  type: array
+                  items:
+                    type: object
+                    required: [dayOfWeek, startMinute, endMinute]
+                    properties:
+                      dayOfWeek: { type: integer, minimum: 0, maximum: 6 }
+                      startMinute: { type: integer }
+                      endMinute: { type: integer }
+      responses:
+        '200':
+          description: OK
+  /admin/users:
+    get:
+      tags: [Admin]
+      security: [{ cookieAuth: [] }]
+      summary: List users (admin)
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer }
+        - in: query
+          name: pageSize
+          schema: { type: integer }
+        - in: query
+          name: role
+          schema:
+            type: string
+            enum: [CUSTOMER, EMPLOYEE, ADMIN]
+        - in: query
+          name: search
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+  /admin/users/{id}:
+    patch:
+      tags: [Admin]
+      security: [{ cookieAuth: [] }]
+      summary: Update user (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+  /admin/users/{id}/role:
+    patch:
+      tags: [Admin]
+      security: [{ cookieAuth: [] }]
+      summary: Change user role
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties:
+                role:
+                  type: string
+                  enum: [CUSTOMER, EMPLOYEE, ADMIN]
+      responses:
+        '200':
+          description: OK
+  /admin/analytics/summary:
+    get:
+      tags: [Admin]
+      security: [{ cookieAuth: [] }]
+      summary: Dashboard metrics
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        '200':
+          description: OK
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: ac_access
