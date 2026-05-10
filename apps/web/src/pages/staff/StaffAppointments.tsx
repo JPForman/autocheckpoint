@@ -33,6 +33,7 @@ export function StaffAppointments() {
               <th className="px-4 py-3">When</th>
               <th className="px-4 py-3">Service</th>
               <th className="px-4 py-3">Customer</th>
+              <th className="px-4 py-3">Assigned</th>
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3" />
             </tr>
@@ -48,6 +49,11 @@ export function StaffAppointments() {
                   {a.customer
                     ? `${a.customer.firstName} ${a.customer.lastName}`
                     : a.customerId}
+                </td>
+                <td className="px-4 py-3 text-slate-600">
+                  {a.assignedEmployee
+                    ? `${a.assignedEmployee.firstName} ${a.assignedEmployee.lastName}`
+                    : '—'}
                 </td>
                 <td className="px-4 py-3">
                   <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">

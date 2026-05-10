@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { UserRole } from '@prisma/client';
+import { env } from '../config/env.js';
 import { prisma } from '../lib/prisma.js';
 import { authenticate } from '../middleware/authenticate.js';
 import { validateBody } from '../middleware/validate.js';
@@ -41,7 +42,7 @@ router.get('/', async (req, res, next) => {
       where: { employeeId },
       orderBy: [{ dayOfWeek: 'asc' }, { startMinute: 'asc' }],
     });
-    res.json({ slots });
+    res.json({ slots, schedulingTimeZone: env.SCHEDULING_TIMEZONE });
   } catch (e) {
     next(e);
   }
@@ -92,7 +93,7 @@ router.put('/', validateBody(putAvailabilitySchema), async (req, res, next) => {
       where: { employeeId: targetEmployeeId },
       orderBy: [{ dayOfWeek: 'asc' }, { startMinute: 'asc' }],
     });
-    res.json({ slots: saved });
+    res.json({ slots: saved, schedulingTimeZone: env.SCHEDULING_TIMEZONE });
   } catch (e) {
     next(e);
   }

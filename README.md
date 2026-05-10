@@ -79,7 +79,7 @@ The `api` image runs `prisma migrate deploy` on startup, then starts the server 
 - **API base path:** `/api/v1`
 - **Cookies:** `ac_access` (JWT), `ac_refresh` (opaque, stored hashed server-side)
 - **Customer rules:** reschedule/cancel only before `APPOINTMENT_CHANGE_MIN_HOURS` (default 24) from the scheduled start; see `apps/api/.env.example`
-- **Availability:** validated in **UTC** on the server; align booking times accordingly (documented in the staff availability UI)
+- **Availability:** `SCHEDULING_TIMEZONE` (IANA, default `UTC`) defines how stored weekly windows map to real instants; set it to your shop’s zone in `apps/api/.env`
 
 ## Project layout
 

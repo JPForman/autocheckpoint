@@ -16,6 +16,21 @@ const envSchema = z.object({
   FRONTEND_URL: z.string().url().default('http://localhost:5173'),
   APPOINTMENT_CHANGE_MIN_HOURS: z.coerce.number().min(0).default(24),
   DEFAULT_APPOINTMENT_DURATION_MINUTES: z.coerce.number().min(15).max(480).default(60),
+  /** IANA zone for interpreting stored availability (day + minutes since local midnight). */
+  SCHEDULING_TIMEZONE: z
+    .string()
+    .min(1)
+    .default('UTC')
+    .superRefine((tz, ctx) => {
+      try {
+        new Intl.DateTimeFormat('en-US', { timeZone: tz });
+      } catch {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Invalid SCHEDULING_TIMEZONE (not a valid IANA time zone): ${tz}`,
+        });
+      }
+    }),
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.coerce.number().optional(),
   SMTP_SECURE: z.coerce.boolean().optional(),

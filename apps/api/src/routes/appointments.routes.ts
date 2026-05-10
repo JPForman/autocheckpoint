@@ -169,7 +169,7 @@ router.post(
           throw new AppError(
             400,
             'VALIDATION_ERROR',
-            'Requested time is outside the assigned employee availability (UTC)',
+            `Requested time is outside the assigned employee availability (${env.SCHEDULING_TIMEZONE})`,
           );
         }
       }
@@ -192,6 +192,19 @@ router.post(
     }
   },
 );
+
+router.get('/employees', async (_req, res, next) => {
+  try {
+    const employees = await prisma.user.findMany({
+      where: { role: UserRole.EMPLOYEE },
+      select: { id: true, firstName: true, lastName: true },
+      orderBy: [{ lastName: 'asc' }, { firstName: 'asc' }],
+    });
+    res.json({ employees });
+  } catch (e) {
+    next(e);
+  }
+});
 
 router.get('/:id', async (req, res, next) => {
   try {
@@ -284,6 +297,10 @@ router.patch('/:id', validateBody(patchAppointmentSchema), async (req, res, next
     }
 
     let assignedEmployeeId = appt.assignedEmployeeId;
+    const assigneeChanged =
+      isStaff &&
+      body.assignedEmployeeId !== undefined &&
+      (body.assignedEmployeeId as string | null) !== appt.assignedEmployeeId;
     if (isStaff && body.assignedEmployeeId !== undefined) {
       const v = body.assignedEmployeeId as string | null;
       if (v) {
@@ -293,13 +310,13 @@ router.patch('/:id', validateBody(patchAppointmentSchema), async (req, res, next
       assignedEmployeeId = v;
     }
 
-    if (timeChanged && assignedEmployeeId) {
+    if (assignedEmployeeId && (timeChanged || assigneeChanged)) {
       const ok = await employeeCoversSlot(assignedEmployeeId, startsAt, endsAt);
       if (!ok) {
         throw new AppError(
           400,
           'VALIDATION_ERROR',
-          'Time is outside assigned employee availability (UTC)',
+          `Time is outside assigned employee availability (${env.SCHEDULING_TIMEZONE})`,
         );
       }
     }

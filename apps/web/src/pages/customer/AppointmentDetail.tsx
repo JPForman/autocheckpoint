@@ -6,7 +6,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { api, getApiErrorMessage } from '../../lib/api';
 import { formatDateTime } from '../../lib/format';
-import type { Appointment, AppointmentStatus } from '../../types';
+import type { Appointment, AppointmentStatus, EmployeeSummary } from '../../types';
 
 const customerSchema = z.object({
   startsAt: z.string().optional(),
@@ -23,6 +23,7 @@ const staffSchema = z.object({
     'NO_SHOW',
   ] as const),
   notes: z.string().max(5000).optional(),
+  assignedEmployeeId: z.string().optional(),
 });
 
 type StaffForm = z.infer<typeof staffSchema>;
@@ -37,6 +38,7 @@ export function AppointmentDetail() {
   const { id } = useParams();
   const { user } = useAuth();
   const [appt, setAppt] = useState<Appointment | null>(null);
+  const [employees, setEmployees] = useState<EmployeeSummary[]>([]);
   const [err, setErr] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
 
@@ -50,8 +52,12 @@ export function AppointmentDetail() {
   const staffForm = useForm<StaffForm>({
     resolver: zodResolver(staffSchema),
     values: appt
-      ? { status: appt.status, notes: appt.notes ?? '' }
-      : { status: 'SCHEDULED', notes: '' },
+      ? {
+          status: appt.status,
+          notes: appt.notes ?? '',
+          assignedEmployeeId: appt.assignedEmployeeId ?? '',
+        }
+      : { status: 'SCHEDULED', notes: '', assignedEmployeeId: '' },
   });
 
   const load = async () => {
@@ -68,6 +74,18 @@ export function AppointmentDetail() {
   useEffect(() => {
     void load();
   }, [id]);
+
+  useEffect(() => {
+    if (!isStaff) return;
+    (async () => {
+      try {
+        const { data } = await api.get<{ employees: EmployeeSummary[] }>('/appointments/employees');
+        setEmployees(data.employees);
+      } catch {
+        setEmployees([]);
+      }
+    })();
+  }, [isStaff]);
 
   if (err && !appt) {
     return (
@@ -96,6 +114,17 @@ export function AppointmentDetail() {
       <h1 className="mt-4 text-2xl font-bold text-slate-900">{appt.serviceType}</h1>
       <p className="mt-1 text-slate-600">{formatDateTime(appt.startsAt)}</p>
       <p className="text-sm text-slate-500">Status: {appt.status}</p>
+      {appt.assignedEmployee && (
+        <p className="mt-2 text-sm text-slate-700">
+          Assigned to{' '}
+          <span className="font-medium">
+            {appt.assignedEmployee.firstName} {appt.assignedEmployee.lastName}
+          </span>
+        </p>
+      )}
+      {isStaff && !appt.assignedEmployee && (
+        <p className="mt-2 text-sm text-slate-500">Unassigned — no technician on this appointment.</p>
+      )}
 
       {appt.vehicle && (
         <div className="mt-6 rounded-xl border border-slate-200 bg-white p-4">
@@ -204,6 +233,9 @@ export function AppointmentDetail() {
               await api.patch(`/appointments/${appt.id}`, {
                 status: data.status as AppointmentStatus,
                 notes: data.notes?.trim() ? data.notes : null,
+                assignedEmployeeId: data.assignedEmployeeId?.trim()
+                  ? data.assignedEmployeeId.trim()
+                  : null,
               });
               setMsg('Saved.');
               await load();
@@ -235,6 +267,20 @@ export function AppointmentDetail() {
               className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
               {...staffForm.register('notes')}
             />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-600">Assigned technician</label>
+            <select
+              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              {...staffForm.register('assignedEmployeeId')}
+            >
+              <option value="">Unassigned</option>
+              {employees.map((emp) => (
+                <option key={emp.id} value={emp.id}>
+                  {emp.firstName} {emp.lastName}
+                </option>
+              ))}
+            </select>
           </div>
           <button
             type="submit"

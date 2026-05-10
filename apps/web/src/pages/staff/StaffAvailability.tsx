@@ -16,11 +16,13 @@ export function StaffAvailability() {
   const [msg, setMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [targetEmployeeId, setTargetEmployeeId] = useState('');
+  const [schedulingTimeZone, setSchedulingTimeZone] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setErr(null);
     if (isAdmin && !targetEmployeeId) {
       setRows([emptyRow]);
+      setSchedulingTimeZone(null);
       setLoading(false);
       return;
     }
@@ -28,9 +30,13 @@ export function StaffAvailability() {
     try {
       const params =
         isAdmin && targetEmployeeId ? { employeeId: targetEmployeeId } : undefined;
-      const { data } = await api.get<{ slots: AvailabilitySlot[] }>('/availability', {
+      const { data } = await api.get<{
+        slots: AvailabilitySlot[];
+        schedulingTimeZone?: string;
+      }>('/availability', {
         params,
       });
+      setSchedulingTimeZone(data.schedulingTimeZone ?? null);
       if (data.slots.length) {
         setRows(
           data.slots.map((s) => ({
@@ -70,7 +76,11 @@ export function StaffAvailability() {
     <div>
       <h1 className="text-2xl font-bold text-slate-900">Availability</h1>
       <p className="mt-1 text-slate-600">
-        Weekly windows use UTC. Minutes are counted from midnight (0–1440).
+        Weekly windows use the server scheduling timezone
+        {schedulingTimeZone ? (
+          <span className="font-mono text-slate-800"> ({schedulingTimeZone})</span>
+        ) : null}
+        . Day names and minutes are local to that zone (0–1440 from midnight).
       </p>
 
       {isAdmin && (

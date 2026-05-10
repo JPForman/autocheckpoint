@@ -1,4 +1,6 @@
 import { AppointmentStatus } from '@prisma/client';
+import { env } from '../config/env.js';
+import { getZonedSlotParts } from './schedulingZone.js';
 import { prisma } from './prisma.js';
 
 export async function hasSchedulingConflict(
@@ -25,14 +27,15 @@ export async function employeeCoversSlot(
   const slots = await prisma.employeeAvailability.findMany({ where: { employeeId } });
   if (slots.length === 0) return false;
 
-  const startDay = startsAt.getUTCDay();
-  const endDay = endsAt.getUTCDay();
-  if (startDay !== endDay) {
+  const tz = env.SCHEDULING_TIMEZONE;
+  const startZ = getZonedSlotParts(startsAt, tz);
+  const endZ = getZonedSlotParts(endsAt, tz);
+  if (startZ.calendarKey !== endZ.calendarKey) {
     return false;
   }
 
-  const sm = startsAt.getUTCHours() * 60 + startsAt.getUTCMinutes();
-  const em = endsAt.getUTCHours() * 60 + endsAt.getUTCMinutes();
+  const { dayOfWeek: startDay, minuteOfDay: sm } = startZ;
+  const { minuteOfDay: em } = endZ;
   if (em <= sm) return false;
 
   return slots.some(

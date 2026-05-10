@@ -10,6 +10,13 @@ export type User = {
   createdAt: string;
 };
 
+/** Minimal employee row from GET /appointments/employees */
+export type EmployeeSummary = {
+  id: string;
+  firstName: string;
+  lastName: string;
+};
+
 export type Vehicle = {
   id: string;
   userId: string;

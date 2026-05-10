@@ -57,6 +57,11 @@ export function Appointments() {
                     </Link>
                     <p className="text-sm text-slate-600">{formatDateTime(a.startsAt)}</p>
                     <p className="text-xs text-slate-500">Status: {a.status}</p>
+                    {a.assignedEmployee && (
+                      <p className="text-xs text-slate-600">
+                        Technician: {a.assignedEmployee.firstName} {a.assignedEmployee.lastName}
+                      </p>
+                    )}
                   </div>
                 </li>
               ))}
@@ -82,6 +87,11 @@ export function Appointments() {
                   </Link>
                   <p className="text-sm text-slate-600">{formatDateTime(a.startsAt)}</p>
                   <p className="text-xs text-slate-500">Status: {a.status}</p>
+                  {a.assignedEmployee && (
+                    <p className="text-xs text-slate-600">
+                      Technician: {a.assignedEmployee.firstName} {a.assignedEmployee.lastName}
+                    </p>
+                  )}
                 </li>
               ))}
             </ul>

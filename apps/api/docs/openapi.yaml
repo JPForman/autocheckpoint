@@ -214,6 +214,27 @@ paths:
       responses:
         '201':
           description: Created
+  /appointments/employees:
+    get:
+      tags: [Appointments]
+      security: [{ cookieAuth: [] }]
+      summary: List employees for booking or assignment
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  employees:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string }
+                        firstName: { type: string }
+                        lastName: { type: string }
   /appointments/{id}:
     get:
       tags: [Appointments]
@@ -252,6 +273,18 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  schedulingTimeZone:
+                    type: string
+                    description: IANA zone used when validating appointments against these windows
+                  slots:
+                    type: array
+                    items:
+                      type: object
     put:
       tags: [Availability]
       security: [{ cookieAuth: [] }]
@@ -278,6 +311,17 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  schedulingTimeZone:
+                    type: string
+                  slots:
+                    type: array
+                    items:
+                      type: object
   /admin/users:
     get:
       tags: [Admin]

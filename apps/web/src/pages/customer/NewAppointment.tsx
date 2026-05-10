@@ -4,13 +4,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
 import { api, getApiErrorMessage } from '../../lib/api';
-import type { Vehicle } from '../../types';
+import type { EmployeeSummary, Vehicle } from '../../types';
 
 const schema = z.object({
   vehicleId: z.string().min(1, 'Select a vehicle'),
   startsAt: z.string().min(1, 'Pick date and time'),
   serviceType: z.string().min(1, 'Required'),
   customerNotes: z.string().max(2000).optional(),
+  assignedEmployeeId: z.string().optional(),
 });
 
 type Form = z.infer<typeof schema>;
@@ -18,6 +19,7 @@ type Form = z.infer<typeof schema>;
 export function NewAppointment() {
   const nav = useNavigate();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [employees, setEmployees] = useState<EmployeeSummary[]>([]);
   const [loadErr, setLoadErr] = useState<string | null>(null);
   const [submitErr, setSubmitErr] = useState<string | null>(null);
 
@@ -32,8 +34,14 @@ export function NewAppointment() {
       try {
         const { data } = await api.get<{ vehicles: Vehicle[] }>('/vehicles');
         setVehicles(data.vehicles);
-      } catch (e) {
-        setLoadErr(getApiErrorMessage(e));
+      } catch (err) {
+        setLoadErr(getApiErrorMessage(err));
+      }
+      try {
+        const { data } = await api.get<{ employees: EmployeeSummary[] }>('/appointments/employees');
+        setEmployees(data.employees);
+      } catch {
+        setEmployees([]);
       }
     })();
   }, []);
@@ -42,8 +50,9 @@ export function NewAppointment() {
     <div className="mx-auto max-w-lg">
       <h1 className="text-2xl font-bold text-slate-900">Schedule appointment</h1>
       <p className="mt-1 text-sm text-slate-600">
-        Times are sent to the server in your local timezone. Availability checks for assigned staff
-        use UTC on the server—see README for details.
+        You pick a start time in your own timezone; the server converts it to an exact instant.
+        If you request a preferred technician, their schedule is checked in the business scheduling
+        timezone configured on the server (see staff availability).
       </p>
 
       {loadErr && <p className="mt-4 text-sm text-red-600">{loadErr}</p>}
@@ -68,6 +77,9 @@ export function NewAppointment() {
                 startsAt: starts.toISOString(),
                 serviceType: data.serviceType,
                 customerNotes: data.customerNotes || undefined,
+                ...(data.assignedEmployeeId?.trim()
+                  ? { assignedEmployeeId: data.assignedEmployeeId.trim() }
+                  : {}),
               });
               nav(`/appointments/${(res as { appointment: { id: string } }).appointment.id}`);
             } catch (e) {
@@ -119,6 +131,24 @@ export function NewAppointment() {
               <p className="mt-1 text-sm text-red-600">{errors.serviceType.message}</p>
             )}
           </div>
+          {employees.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-slate-700">
+                Preferred technician (optional)
+              </label>
+              <select
+                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                {...register('assignedEmployeeId')}
+              >
+                <option value="">No preference</option>
+                {employees.map((emp) => (
+                  <option key={emp.id} value={emp.id}>
+                    {emp.firstName} {emp.lastName}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <div>
             <label className="block text-sm font-medium text-slate-700">Notes (optional)</label>
             <textarea
