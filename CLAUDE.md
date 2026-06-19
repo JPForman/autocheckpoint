@@ -1,6 +1,10 @@
 # CLAUDE.md
 
+We are building the app described in @SPEC.md. Read that file for general architectural tasks or to double-check the ecact database structure, tech stack, or application architecture.
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+Keep your replies extremely concise and focus on conveying the key information. No unnecessary fluff, no super long code snippets.
 
 ## Commands
 
