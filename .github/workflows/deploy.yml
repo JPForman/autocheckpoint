@@ -63,7 +63,10 @@ jobs:
         with:
           node-version: '20'
 
-      - run: npm install
+      - run: npm ci
+
+      - name: Install linux native bindings
+        run: npm install --no-save @rolldown/binding-linux-x64-gnu@1.0.0-rc.18 lightningcss-linux-x64-gnu@1.32.0 @tailwindcss/oxide-linux-x64-gnu@4.3.0
 
       - name: Build web app
         run: npm run build -w web
