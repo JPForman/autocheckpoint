@@ -5,6 +5,7 @@ COPY package.json package-lock.json ./
 COPY apps/api apps/api
 COPY apps/web/package.json apps/web/package.json
 RUN npm ci
+RUN npx prisma generate --schema=apps/api/prisma/schema.prisma
 RUN npm run build -w api
 
 FROM node:20-bookworm-slim
