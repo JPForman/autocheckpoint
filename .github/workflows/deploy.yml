@@ -65,8 +65,8 @@ jobs:
 
       - run: npm ci
 
-      - name: Install platform-specific optional deps
-        run: npm install --no-save --include=optional -w web
+      - name: Install linux rolldown binding
+        run: npm install --no-save @rolldown/binding-linux-x64-gnu@1.0.0-rc.18
 
       - name: Build web app
         run: npm run build -w web
