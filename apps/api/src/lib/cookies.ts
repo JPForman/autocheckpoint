@@ -10,7 +10,7 @@ export function accessCookieOptions(maxAgeMs: number): CookieOptions {
   return {
     httpOnly: true,
     secure: isProd,
-    sameSite: 'lax',
+    sameSite: isProd ? 'none' : 'lax',
     path: '/',
     maxAge: maxAgeMs,
   };
@@ -20,7 +20,7 @@ export function refreshCookieOptions(maxAgeMs: number): CookieOptions {
   return {
     httpOnly: true,
     secure: isProd,
-    sameSite: 'lax',
+    sameSite: isProd ? 'none' : 'lax',
     path: '/',
     maxAge: maxAgeMs,
   };
