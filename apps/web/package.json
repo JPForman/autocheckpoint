@@ -19,6 +19,9 @@
     "react-router-dom": "^7.15.0",
     "zod": "^4.4.3"
   },
+  "optionalDependencies": {
+    "@rolldown/binding-linux-x64-gnu": "1.0.0-rc.18"
+  },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@tailwindcss/vite": "^4.3.0",
