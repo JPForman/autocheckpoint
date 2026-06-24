@@ -35,12 +35,14 @@ export function AppShell() {
     { to: '/dashboard', label: 'Dashboard' },
     { to: '/appointments', label: 'Appointments' },
     { to: '/vehicles', label: 'Vehicles' },
+    { to: '/towing', label: 'Towing' },
     { to: '/profile', label: 'Profile' },
   ];
 
   const staffNav = [
     { to: '/staff/appointments', label: 'Shop appointments' },
     { to: '/staff/availability', label: 'My availability' },
+    { to: '/staff/towing', label: 'Tow jobs' },
   ];
 
   const adminNav = [

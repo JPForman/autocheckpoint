@@ -5,6 +5,7 @@ import vehiclesRoutes from './vehicles.routes.js';
 import appointmentsRoutes from './appointments.routes.js';
 import availabilityRoutes from './availability.routes.js';
 import adminRoutes from './admin.routes.js';
+import towJobsRoutes from './tow-jobs.routes.js';
 
 const router = Router();
 
@@ -18,6 +19,7 @@ router.use('/vehicles', vehiclesRoutes);
 router.use('/appointments', appointmentsRoutes);
 router.use('/availability', availabilityRoutes);
 router.use('/admin', adminRoutes);
+router.use('/tow-jobs', towJobsRoutes);
 
 router.use((_req, res) => {
   res.status(404).json({

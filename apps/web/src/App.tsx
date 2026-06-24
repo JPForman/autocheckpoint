@@ -15,6 +15,8 @@ import { Profile } from './pages/customer/Profile';
 import { Vehicles } from './pages/customer/Vehicles';
 import { StaffAppointments } from './pages/staff/StaffAppointments';
 import { StaffAvailability } from './pages/staff/StaffAvailability';
+import { StaffTowing } from './pages/staff/StaffTowing';
+import { CustomerTowing } from './pages/customer/CustomerTowing';
 import { AdminUsers } from './pages/admin/AdminUsers';
 import { AdminAnalytics } from './pages/admin/AdminAnalytics';
 
@@ -39,6 +41,7 @@ export default function App() {
                 <Route path="/appointments/new" element={<NewAppointment />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/vehicles" element={<Vehicles />} />
+                <Route path="/towing" element={<CustomerTowing />} />
               </Route>
 
               <Route path="/appointments/:id" element={<AppointmentDetail />} />
@@ -48,6 +51,7 @@ export default function App() {
               >
                 <Route path="/staff/appointments" element={<StaffAppointments />} />
                 <Route path="/staff/availability" element={<StaffAvailability />} />
+                <Route path="/staff/towing" element={<StaffTowing />} />
               </Route>
 
               <Route element={<RoleGate allow={['ADMIN']} redirectTo="/dashboard" />}>

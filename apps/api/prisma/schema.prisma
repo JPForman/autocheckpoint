@@ -21,6 +21,15 @@ enum AppointmentStatus {
   NO_SHOW
 }
 
+enum TowJobStatus {
+  PENDING
+  EN_ROUTE
+  VEHICLE_LOADED
+  IN_TRANSIT
+  DELIVERED
+  CANCELED
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -38,6 +47,8 @@ model User {
   appointmentsAsCustomer Appointment[]        @relation("CustomerAppointments")
   appointmentsAsEmployee Appointment[]        @relation("AssignedEmployee")
   employeeAvailability   EmployeeAvailability[]
+  towJobsAsCustomer      TowJob[]             @relation("TowJobCustomer")
+  towJobsCreated         TowJob[]             @relation("TowJobCreatedBy")
 }
 
 model RefreshToken {
@@ -76,6 +87,7 @@ model Vehicle {
   updatedAt    DateTime @updatedAt
 
   appointments Appointment[]
+  towJobs      TowJob[]
 
   @@index([userId])
 }
@@ -100,6 +112,34 @@ model Appointment {
   @@index([customerId, startsAt])
   @@index([startsAt])
   @@index([status])
+}
+
+model TowJob {
+  id               String       @id @default(cuid())
+  vehicleId        String?
+  vehicle          Vehicle?     @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  vehicleDesc      String?
+  customerId       String?
+  customer         User?        @relation("TowJobCustomer", fields: [customerId], references: [id], onDelete: SetNull)
+  createdById      String
+  createdBy        User         @relation("TowJobCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  status           TowJobStatus @default(PENDING)
+  notes            String?
+  pickupLat        Float
+  pickupLng        Float
+  pickupLabel      String?
+  destinationLat   Float
+  destinationLng   Float
+  destinationLabel String?
+  currentLat       Float?
+  currentLng       Float?
+  currentUpdatedAt DateTime?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@index([customerId])
+  @@index([status])
+  @@index([createdById])
 }
 
 model EmployeeAvailability {
