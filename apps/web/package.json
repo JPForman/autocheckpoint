@@ -14,6 +14,7 @@
     "@hookform/resolvers": "^5.2.2",
     "axios": "^1.16.0",
     "react": "^19.2.5",
+    "react-calendar": "^6.0.1",
     "react-dom": "^19.2.5",
     "react-hook-form": "^7.75.0",
     "react-router-dom": "^7.15.0",

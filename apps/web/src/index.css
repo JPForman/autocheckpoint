@@ -9,3 +9,32 @@ body {
 #root {
   min-height: 100vh;
 }
+
+/* react-calendar overrides */
+.appt-calendar .react-calendar {
+  width: 100%;
+  border: none;
+  font-family: inherit;
+  font-size: 0.875rem;
+}
+.appt-calendar .react-calendar__navigation button:enabled:hover,
+.appt-calendar .react-calendar__navigation button:enabled:focus {
+  background-color: #f1f5f9;
+}
+.appt-calendar .react-calendar__tile:enabled:hover,
+.appt-calendar .react-calendar__tile:enabled:focus {
+  background-color: #f1f5f9;
+}
+.appt-calendar .react-calendar__tile--now {
+  background: #e0e7ff;
+}
+.appt-calendar .react-calendar__tile--now:enabled:hover,
+.appt-calendar .react-calendar__tile--now:enabled:focus {
+  background: #c7d2fe;
+}
+.appt-calendar .react-calendar__tile--active,
+.appt-calendar .react-calendar__tile--active:enabled:hover,
+.appt-calendar .react-calendar__tile--active:enabled:focus {
+  background: #4f46e5;
+  color: white;
+}
