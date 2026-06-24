@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api, getApiErrorMessage } from '../../lib/api';
+import { useAuth } from '../../context/AuthContext';
 import { TowMap } from '../../components/TowMap';
 import type { TowJob, TowJobStatus } from '../../types';
 
@@ -40,14 +41,18 @@ function vehicleSummary(job: TowJob) {
 }
 
 export function CustomerTowing() {
+  const { user } = useAuth();
   const [jobs, setJobs] = useState<TowJob[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
 
   const load = useCallback(async () => {
+    if (!user) return;
     setErr(null);
     try {
-      const { data } = await api.get<{ towJobs: TowJob[] }>('/tow-jobs');
+      const { data } = await api.get<{ towJobs: TowJob[] }>('/tow-jobs', {
+        params: { customerId: user.id },
+      });
       setJobs(sortJobs(data.towJobs));
     } catch (e) {
       setErr(getApiErrorMessage(e));
@@ -56,7 +61,7 @@ export function CustomerTowing() {
     }
   }, []);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => { void load(); }, [load, user]);
 
   return (
     <div>
