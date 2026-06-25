@@ -31,24 +31,26 @@ export function createApp() {
   app.use(express.json({ limit: '1mb' }));
   app.use(cookieParser());
 
-  const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    limit: 20,
-    standardHeaders: 'draft-8',
-    legacyHeaders: false,
-    message: { error: { code: 'RATE_LIMITED', message: 'Too many requests, please try again later.' } },
-  });
+  if (env.NODE_ENV !== 'development') {
+    const authLimiter = rateLimit({
+      windowMs: 15 * 60 * 1000,
+      limit: 40,
+      standardHeaders: 'draft-8',
+      legacyHeaders: false,
+      message: { error: { code: 'RATE_LIMITED', message: 'Too many requests, please try again later.' } },
+    });
 
-  const apiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    limit: 300,
-    standardHeaders: 'draft-8',
-    legacyHeaders: false,
-    message: { error: { code: 'RATE_LIMITED', message: 'Too many requests, please try again later.' } },
-  });
+    const apiLimiter = rateLimit({
+      windowMs: 15 * 60 * 1000,
+      limit: 600,
+      standardHeaders: 'draft-8',
+      legacyHeaders: false,
+      message: { error: { code: 'RATE_LIMITED', message: 'Too many requests, please try again later.' } },
+    });
 
-  app.use('/api/v1/auth', authLimiter);
-  app.use('/api/v1', apiLimiter);
+    app.use('/api/v1/auth', authLimiter);
+    app.use('/api/v1', apiLimiter);
+  }
 
   app.use('/api/v1', apiRouter);
 

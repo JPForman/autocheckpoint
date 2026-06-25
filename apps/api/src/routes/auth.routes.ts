@@ -28,8 +28,9 @@ import { sendPasswordResetEmail } from '../lib/mail.js';
 
 const router = Router();
 
-const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 30, standardHeaders: true });
-const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20, standardHeaders: true });
+const isDev = process.env.NODE_ENV === 'development';
+const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: isDev ? 10_000 : 60, standardHeaders: true });
+const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: isDev ? 10_000 : 40, standardHeaders: true });
 
 function userPublic(u: {
   id: string;
