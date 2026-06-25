@@ -85,11 +85,18 @@ router.get('/', async (req, res, next) => {
     const { status, customerId } = parsed.data;
     const isStaff = req.user!.role === UserRole.EMPLOYEE || req.user!.role === UserRole.ADMIN;
 
+    // When scoped to a user (non-staff always, staff when customerId passed),
+    // match on explicit customerId OR vehicle ownership so jobs with no
+    // customerId but a linked vehicle still appear for the vehicle owner.
+    const scopeId = isStaff ? customerId : req.user!.id;
+    const scopeFilter = scopeId
+      ? { OR: [{ customerId: scopeId }, { vehicle: { userId: scopeId } }] }
+      : {};
+
     const list = await prisma.towJob.findMany({
       where: {
-        ...(isStaff ? {} : { customerId: req.user!.id }),
+        ...scopeFilter,
         ...(status ? { status } : {}),
-        ...(isStaff && customerId ? { customerId } : {}),
       },
       orderBy: { createdAt: 'desc' },
       include: towJobInclude,
