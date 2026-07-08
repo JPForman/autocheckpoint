@@ -68,7 +68,7 @@ export function Register() {
         ? '/staff/appointments'
         : user.role === 'ADMIN'
           ? '/admin/analytics'
-          : '/dashboard';
+          : '/appointments';
     return <Navigate to={dest} replace />;
   }
 
@@ -112,7 +112,7 @@ export function Register() {
           </h2>
           <p className="mt-6 max-w-sm text-lg leading-relaxed text-zinc-400">
             Create a free account to book services, manage your vehicles, and
-            track every appointment from one dashboard.
+            track every appointment in one place.
           </p>
         </div>
 
@@ -171,7 +171,7 @@ export function Register() {
             className="space-y-5"
             onSubmit={handleSubmit(async (data) => {
               await registerUser(data);
-              nav('/dashboard', { replace: true });
+              nav('/appointments', { replace: true });
             })}
             noValidate
           >

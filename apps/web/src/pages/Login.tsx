@@ -14,7 +14,7 @@ type Form = z.infer<typeof schema>;
 function roleHome(role: string) {
   if (role === 'EMPLOYEE') return '/staff/appointments';
   if (role === 'ADMIN') return '/admin/analytics';
-  return '/dashboard';
+  return '/appointments';
 }
 
 function CarIcon() {

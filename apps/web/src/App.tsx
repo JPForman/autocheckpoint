@@ -7,7 +7,6 @@ import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { ForgotPassword } from './pages/ForgotPassword';
 import { ResetPassword } from './pages/ResetPassword';
-import { Dashboard } from './pages/customer/Dashboard';
 import { Appointments } from './pages/customer/Appointments';
 import { NewAppointment } from './pages/customer/NewAppointment';
 import { AppointmentDetail } from './pages/customer/AppointmentDetail';
@@ -36,7 +35,6 @@ export default function App() {
               <Route
                 element={<RoleGate allow={['CUSTOMER', 'ADMIN']} redirectTo="/staff/appointments" />}
               >
-                <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/appointments" element={<Appointments />} />
                 <Route path="/appointments/new" element={<NewAppointment />} />
                 <Route path="/profile" element={<Profile />} />
@@ -47,14 +45,14 @@ export default function App() {
               <Route path="/appointments/:id" element={<AppointmentDetail />} />
 
               <Route
-                element={<RoleGate allow={['EMPLOYEE', 'ADMIN']} redirectTo="/dashboard" />}
+                element={<RoleGate allow={['EMPLOYEE', 'ADMIN']} redirectTo="/appointments" />}
               >
                 <Route path="/staff/appointments" element={<StaffAppointments />} />
                 <Route path="/staff/availability" element={<StaffAvailability />} />
                 <Route path="/staff/towing" element={<StaffTowing />} />
               </Route>
 
-              <Route element={<RoleGate allow={['ADMIN']} redirectTo="/dashboard" />}>
+              <Route element={<RoleGate allow={['ADMIN']} redirectTo="/appointments" />}>
                 <Route path="/admin/users" element={<AdminUsers />} />
                 <Route path="/admin/analytics" element={<AdminAnalytics />} />
               </Route>

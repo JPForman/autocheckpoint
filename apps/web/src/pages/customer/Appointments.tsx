@@ -17,7 +17,7 @@ function readStoredView(): ViewMode {
   } catch {
     /* ignore */
   }
-  return 'list';
+  return 'calendar';
 }
 
 function persistView(mode: ViewMode) {

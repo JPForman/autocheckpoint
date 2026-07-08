@@ -21,10 +21,10 @@ export function Home() {
           <>
             {(user.role === 'CUSTOMER' || user.role === 'ADMIN') && (
               <Link
-                to="/dashboard"
+                to="/appointments"
                 className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
               >
-                Go to dashboard
+                Go to appointments
               </Link>
             )}
             {(user.role === 'EMPLOYEE' || user.role === 'ADMIN') && (
