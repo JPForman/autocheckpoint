@@ -2,6 +2,9 @@
 
 Full-stack auto care scheduling: **React (Vite) + Tailwind** frontend, **Node.js (Express) + Prisma + PostgreSQL** API, **JWT** auth via **httpOnly cookies** with refresh rotation, and **RBAC** (`CUSTOMER`, `EMPLOYEE`, `ADMIN`).
 
+## Live Instance
+https://autocheckin-500123-45cf9.web.app/
+
 ## Prerequisites
 
 - Node.js 20+
