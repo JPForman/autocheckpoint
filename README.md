@@ -1,9 +1,38 @@
 # AutoCheckpoint
 
-Full-stack auto care scheduling: **React (Vite) + Tailwind** frontend, **Node.js (Express) + Prisma + PostgreSQL** API, **JWT** auth via **httpOnly cookies** with refresh rotation, and **RBAC** (`CUSTOMER`, `EMPLOYEE`, `ADMIN`).
+Full-stack auto care scheduling app using the following: **React (Vite) + Tailwind** frontend, **Node.js (Express) + Prisma + PostgreSQL** API, **JWT** auth via **httpOnly cookies** with refresh rotation, and **RBAC** (`CUSTOMER`, `EMPLOYEE`, `ADMIN`).
 
 ## Live Instance
 https://autocheckin-500123-45cf9.web.app/
+
+## Features
+
+**Authentication**
+- Email/password registration and login, httpOnly JWT + rotating refresh cookies
+- Forgot/reset password via time-limited emailed link
+- Auto session refresh on 401 (Axios interceptor)
+
+**Customer**
+- Book, reschedule, and cancel appointments (list or calendar view)
+- Vehicle garage (CRUD), optional employee assignment at booking
+- Request tow jobs and track pickup/destination and live tow location
+- Edit profile (name, phone)
+
+**Employee**
+- View and manage all shop appointments; self-assign, update status/notes
+- Weekly availability editor (day + time-range windows)
+- Manage tow jobs: create, update status, post live location updates
+
+**Admin**
+- Everything employees can do, plus:
+- Paginated user directory with search/filter and role management
+- Shop analytics (appointments by status, upcoming count, total users)
+
+**Scheduling rules**
+- No overlapping appointments shop-wide
+- Employee assignment validated against their availability windows
+- Customer reschedule/cancel blocked within `APPOINTMENT_CHANGE_MIN_HOURS` of start
+- Future-only booking
 
 ## Prerequisites
 
